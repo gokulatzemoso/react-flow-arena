@@ -9,6 +9,9 @@ import ReactFlow, {
   Connection,
   Edge,
   BackgroundVariant,
+  OnSelectionChangeParams,
+  useOnSelectionChange,
+  ReactFlowProvider,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -18,12 +21,20 @@ const initialNodes = [
   { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
 ];
 const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
-
-export default function App() {
+const Canvas = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+  const onSelectionChange = ({nodes, edges}: OnSelectionChangeParams) => {
+    console.log('selection change', nodes, edges);
+  }
+
+  useOnSelectionChange({
+    onChange: ({nodes, edges}) => console.log('changed nodes, edges', nodes, edges)
+  })
+  console.log('rendering');
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -33,6 +44,8 @@ export default function App() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onSelectionChange={onSelectionChange}
+
       >
         <Controls />
         <MiniMap />
@@ -40,4 +53,11 @@ export default function App() {
       </ReactFlow>
     </div>
   );
+}
+export default function App() {
+   return (
+   <ReactFlowProvider>
+      <Canvas />
+    </ReactFlowProvider>
+  )
 }
